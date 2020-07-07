@@ -20,103 +20,103 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-import os, sys
-import wx
+import os
+import sys
 import time
-import cross
-import settings
 # noinspection PyUnresolvedReferences
 from math import *  # DO NOT DELETE THIS
-from config.config_library import get_config, set_config, save_config, clear_vars, set_config_pool, debug_log, printf
+
+import wx
+
+import cross
+import settings
+from config.config_library import get_config, set_config, save_config, clear_vars, debug_log, fprintf
 
 HELP_WEBSITE = 'https://github.com/EPIC-WANG/Datanalyze'  # the website if user tapped HELP
 
 
-# noinspection PyUnusedLocal,DuplicatedCode,PyAttributeOutsideInit
+# noinspection DuplicatedCode,PyAttributeOutsideInit
 # the GUI contains too many duplicated codes, and you know why.
 class Tempest(wx.Frame):
     dpi = get_config("dpi_scale", 1.0)
-    INIT_WINDOW_SIZE_HOR: tuple  = (420 * dpi, 320 * dpi)
-    INIT_WINDOW_SIZE_VER: tuple  = (420 * dpi, 320 * dpi)
-    FULL_WINDOW_SIZE_HOR: tuple  = (750 * dpi, 372 * dpi)
-    FULL_WINDOW_SIZE_VER: tuple  = (460 * dpi, 830 * dpi)
-    MIN_WINDOW_SIZE_HOR: tuple   = (400 * dpi, 170 * dpi)
-    MIN_WINDOW_SIZE_VER: tuple   = (400 * dpi, 170 * dpi)
-    MAX_CHOICE_SIZE: tuple       = (-1       , 36  * dpi)
-    
+    INIT_WINDOW_SIZE_HOR: tuple = (420 * dpi, 320 * dpi)
+    INIT_WINDOW_SIZE_VER: tuple = (420 * dpi, 320 * dpi)
+    FULL_WINDOW_SIZE_HOR: tuple = (850 * dpi, 372 * dpi)
+    FULL_WINDOW_SIZE_VER: tuple = (460 * dpi, 830 * dpi)
+    MIN_WINDOW_SIZE_HOR: tuple = (400 * dpi, 170 * dpi)
+    MIN_WINDOW_SIZE_VER: tuple = (400 * dpi, 170 * dpi)
+    MAX_CHOICE_SIZE: tuple = (-1, 36 * dpi)
+
     @debug_log
     def __init__(self) -> None:
-        """
-        The
-        """
         self.frame = wx.Frame.__init__(self, parent=None, title="Main Frame")
         self.Bind(wx.EVT_CLOSE, self.on_close)
         self.Center()
-        self.set_font()
-        self.set_menu_bar()
-        self.set_panel()
 
-    def set_font(self):
-        self.font_tc_equ = wx.Font(14, wx.MODERN, wx.NORMAL, wx.NORMAL, False, "Consolas")
-        self.winfont = wx.Font(9, wx.MODERN, wx.NORMAL, wx.NORMAL, False, "Segoe UI")
-        # , font=self.winfont
+        def set_font():
+            self.font_tc_equ = wx.Font(14, wx.MODERN, wx.NORMAL, wx.NORMAL, False, "Consolas")
+            self.winfont = wx.Font(9, wx.MODERN, wx.NORMAL, wx.NORMAL, False, "Segoe UI")
 
-    @debug_log
-    def set_menu_bar(self):
-        menu_bar = wx.MenuBar()
-        """"""
-        appmenu = wx.Menu()
-        menu_bar.Append(appmenu, "&Program")
-        menu_close = appmenu.Append(wx.ID_ANY, "Exit")
-        menu_restart = appmenu.Append(wx.ID_ANY, "Restart")
-        menu_restart_and_reset = appmenu.Append(wx.ID_ANY, "Reset and restart")
-        menu_settings = appmenu.Append(wx.ID_ANY, "Settings")
-        self.Bind(wx.EVT_MENU, self.on_close, menu_close)
-        self.Bind(wx.EVT_MENU, self.on_restart, menu_restart)
-        self.Bind(wx.EVT_MENU, self.on_restart_and_reset, menu_restart_and_reset)
-        self.Bind(wx.EVT_MENU, self.on_settings, menu_settings)
+        @debug_log
+        def set_menu_bar():
+            menu_bar = wx.MenuBar()
 
-        """"""
-        plotfilemenu = wx.Menu()
-        menu_bar.Append(plotfilemenu, "&File")
-        menu_save_figure = plotfilemenu.Append(wx.ID_ANY, "Quick save last figure")
-        menu_save_config = plotfilemenu.Append(wx.ID_ANY, "Save config")
-        menu_display_config = plotfilemenu.Append(wx.ID_ANY, "Display config")
-        menu_clear_config = plotfilemenu.Append(wx.ID_ANY, "Clear config")
-        self.Bind(wx.EVT_MENU, self.on_save_figure, menu_save_figure)
-        self.Bind(wx.EVT_MENU, self.on_save_config, menu_save_config)
-        self.Bind(wx.EVT_MENU, self.on_display_config, menu_display_config)
-        self.Bind(wx.EVT_MENU, self.on_clear_config, menu_clear_config)
-        """"""
-        advancedmenu = wx.Menu()
-        menu_bar.Append(advancedmenu, "&Advanced")
-        menu_open_config_commandline = advancedmenu.Append(wx.ID_ANY, "Open config commandline")
-        menu_reset_config = advancedmenu.Append(wx.ID_ANY, "Reset config")
-        menu_abort = advancedmenu.Append(wx.ID_ANY, "Abort the program")
-        self.Bind(wx.EVT_MENU, self.on_open_config_commandline, menu_open_config_commandline)
-        self.Bind(wx.EVT_MENU, self.on_reset_config, menu_reset_config)
-        self.Bind(wx.EVT_MENU, self.on_abort, menu_abort)
-        """"""
-        helpmenu = wx.Menu()
-        menu_bar.Append(helpmenu, "&Help")
-        menu_tutorial = helpmenu.Append(wx.ID_ANY, "Tutorial")
-        menu_about = helpmenu.Append(wx.ID_ANY, "About")
-        self.Bind(wx.EVT_MENU, self.on_tutorial, menu_tutorial)
-        self.Bind(wx.EVT_MENU, self.on_about, menu_about)
-        """"""
+            appmenu = wx.Menu()
+            menu_bar.Append(appmenu, "&Program")
+            menu_close = appmenu.Append(wx.ID_ANY, "Exit")
+            menu_restart = appmenu.Append(wx.ID_ANY, "Restart")
+            menu_restart_and_reset = appmenu.Append(wx.ID_ANY, "Reset and restart")
+            menu_settings = appmenu.Append(wx.ID_ANY, "Settings")
+            self.Bind(wx.EVT_MENU, self.on_close, menu_close)
+            self.Bind(wx.EVT_MENU, self.on_restart, menu_restart)
+            self.Bind(wx.EVT_MENU, self.on_restart_and_reset, menu_restart_and_reset)
+            self.Bind(wx.EVT_MENU, self.on_settings, menu_settings)
 
-        self.SetMenuBar(menu_bar)
 
-    # noinspection PyAttributeOutsideInit
-    @debug_log
-    def set_panel(self):
-        self.panel = wx.Panel(parent=self)
-        dpi = self.dpi
-        self.__panel_hbox_1_l1()
-        self.__panel_hbox_1_l2()
-        self.hbox_1_l3()
-        self.box_comp_main()
-        self.trig_show_basic_opt()
+            plotfilemenu = wx.Menu()
+            menu_bar.Append(plotfilemenu, "&File")
+            menu_save_figure = plotfilemenu.Append(wx.ID_ANY, "Quick save last figure")
+            menu_save_config = plotfilemenu.Append(wx.ID_ANY, "Save config")
+            menu_display_config = plotfilemenu.Append(wx.ID_ANY, "Display config")
+            menu_clear_config = plotfilemenu.Append(wx.ID_ANY, "Clear config")
+            self.Bind(wx.EVT_MENU, self.on_save_figure, menu_save_figure)
+            self.Bind(wx.EVT_MENU, self.on_save_config, menu_save_config)
+            self.Bind(wx.EVT_MENU, self.on_display_config, menu_display_config)
+            self.Bind(wx.EVT_MENU, self.on_clear_config, menu_clear_config)
+
+            advancedmenu = wx.Menu()
+            menu_bar.Append(advancedmenu, "&Advanced")
+            menu_open_config_commandline = advancedmenu.Append(wx.ID_ANY, "Open config commandline")
+            menu_reset_config = advancedmenu.Append(wx.ID_ANY, "Reset config")
+            menu_abort = advancedmenu.Append(wx.ID_ANY, "Abort the program")
+            self.Bind(wx.EVT_MENU, self.on_open_config_commandline, menu_open_config_commandline)
+            self.Bind(wx.EVT_MENU, self.on_reset_config, menu_reset_config)
+            self.Bind(wx.EVT_MENU, self.on_abort, menu_abort)
+
+            helpmenu = wx.Menu()
+            menu_bar.Append(helpmenu, "&Help")
+            menu_tutorial = helpmenu.Append(wx.ID_ANY, "Tutorial")
+            menu_about = helpmenu.Append(wx.ID_ANY, "About")
+            self.Bind(wx.EVT_MENU, self.on_tutorial, menu_tutorial)
+            self.Bind(wx.EVT_MENU, self.on_about, menu_about)
+
+
+            self.SetMenuBar(menu_bar)
+
+        # noinspection PyAttributeOutsideInit
+        @debug_log
+        def set_panel():
+            self.panel = wx.Panel(parent=self)
+            dpi = self.dpi
+            self.__panel_hbox_1_l1()
+            self.__panel_hbox_1_l2()
+            self.hbox_1_l3()
+            self.box_comp_main()
+            self.trig_show_basic_opt()
+
+        set_font()
+        set_menu_bar()
+        set_panel()
 
     # noinspection PyAttributeOutsideInit
     def __panel_hbox_1_l1(self):
@@ -124,7 +124,7 @@ class Tempest(wx.Frame):
         self.create_new_fig = wx.Button(panel, label='start new', size=(-1, 60 * dpi))
         self.create_new_fig.Bind(wx.EVT_BUTTON, self.on_create_new_fig)
         self.start_plot_btn = wx.Button(panel, label='continue', size=(-1, 60 * dpi))
-        self.start_plot_btn.Bind(wx.EVT_BUTTON, self.start_plot_button)
+        self.start_plot_btn.Bind(wx.EVT_BUTTON, self.on_start_plot_button)
         self.settings_btn = wx.Button(panel, label='settings', size=(-1, 22 * dpi))
         self.settings_btn.Bind(wx.EVT_BUTTON, self.on_settings)
 
@@ -304,7 +304,7 @@ class Tempest(wx.Frame):
         dlg = wx.MessageDialog(self.panel, "Do You Want to clear the user variables?", "reset",
                                style=wx.YES_NO | wx.NO_DEFAULT)
         if dlg.ShowModal() == wx.ID_YES:
-            clear_vars(save = True)
+            clear_vars(save=True)
             wx.MessageBox("Done")
 
     @staticmethod
@@ -336,8 +336,6 @@ class Tempest(wx.Frame):
         wx.MessageBox("""Datanalyze  Copyright (C) 2020  Weizheng Wang
 This program comes with ABSOLUTELY NO WARRANTY; for details, please read LICENSE.txt.
 The copyright of this software is limited by the GNU GENERAL PUBLIC LICENSE.
-
-This is a mathematical plotting software developed by using python. 
 """)
 
     @staticmethod
@@ -356,7 +354,7 @@ This is a mathematical plotting software developed by using python.
         set the value of the
         """
         colour_list = [self.colour_opt[selected_colour] for selected_colour in self.colourbox.GetSelections()]
-        set_config_pool(colour=colour_list if colour_list else ['black'])
+        set_config(colour=colour_list if colour_list else ['black'])
         set_config(xllim=eval(self.input9_xllim.GetValue()),
                    xrlim=eval(self.input10_xrlim.GetValue()),
                    yllim=eval(self.input11_yllim.GetValue()),
@@ -380,41 +378,43 @@ This is a mathematical plotting software developed by using python.
                     .replace('\n', '').lstrip())
 
     @debug_log
-    def start_plot_button(self, event=None):
+    def start_plot_button(self, new_fig: bool):
+        #  set the plotting config before checking the equation, allows the user to save the config
         self.trig_set_basic_opt()
+
         inputed_function: str = self.tc_equ.GetValue()
         if not self.__is_runable():
             wx.MessageBox("please input your math equation or commands in the box!")
             return None
-        
-        printf(f"python_mode = {(python_mode := self.input_syntax.GetValue())}", self_=self.start_plot_button)
-        
+        fprintf(f"python_mode = {(python_mode := self.input_syntax.GetValue())}", self_=self.start_plot_button)
+
         if inputed_function != '':
             current_line = 'unknown'
             function = 'unknown'
-            try:
-                if python_mode is False: # it is none python mode
+            try:  # TODO: move these in cross
+                if python_mode is False:  # it is none python mode
                     current_line = 1
                     function: str  # the input equation in each line
                     for function in inputed_function.split('\n'):
                         if not function.isspace() and function != '':
-                            
-                            printf(f"{function=}", self_=self.start_plot_button)
-                            cross.interpret_to_falcon(function, False)
+                            fprintf(f"{function=}", self_=self.start_plot_button)
+                            cross.plot(function, False, new_fig)
+                            new_fig = False
                         current_line += 1
-                    cross.show()
-                
+
                 else:
-                    printf(f"{inputed_function=}", self_=self.start_plot_button)
-                    cross.interpret_to_falcon(inputed_function, True)
+                    fprintf(f"{inputed_function=}", self_=self.start_plot_button)
+                    cross.plot(inputed_function, True, new_fig)
                     wx.MessageBox("Done!")
-                
+
             except KeyboardInterrupt:
-                printf(f"User had canceled the operation in line {current_line}", self_ = self.start_plot_button)
-                wx.MessageBox(f"User had canceled the operation in line {current_line}")
+                fprintf(f"User has canceled the operation in line {current_line}", self_=self.start_plot_button)
+                wx.MessageBox(f"User has canceled the operation in line {current_line}")
             except Exception as _:
-                printf(f"A error occurs during the executing progress in line {current_line}: '{function}': {str(_)}", self_=self.start_plot_button)
-                wx.MessageBox(f"A error occurs during the executing progress in line {current_line}: '{function}' \n {str(_)}")
+                fprintf(f"A error occurs during the executing progress in line {current_line}: '{function}': {str(_)}",
+                        self_=self.start_plot_button)
+                wx.MessageBox(
+                    f"A error occurs during the executing progress in line {current_line}: '{function}' \n {str(_)}")
             cross.show()
         return None
 
@@ -424,21 +424,24 @@ This is a mathematical plotting software developed by using python.
 
     def on_create_new_fig(self, event=None):
         if self.input_syntax.GetValue() is False:
-            cross.new_fig()
-        self.start_plot_button()
+            self.start_plot_button(True)
+
+    def on_start_plot_button(self, event=None):
+        if self.input_syntax.GetValue() is False:
+            self.start_plot_button(False)
 
     @debug_log
     def __toggle_advanced_config(self, is_advanced_mode: bool):
         if not is_advanced_mode:
             # set the value to the default
-            self.calc_count.SetValue(str(get_config("$default_calc_count")))
-            self.figspine.SetValue(get_config("$default_figspine"))
-            self.cho5_linestyle.SetValue(get_config("$default_linestyle"))
+            self.calc_count.SetValue(str(get_config("calc_count")))
+            self.figspine.SetValue(get_config("figspine"))
+            self.cho5_linestyle.SetValue(get_config("linestyle"))
 
         self.calc_count.Enable(is_advanced_mode)
         self.figspine.Enable(is_advanced_mode)
         self.cho5_linestyle.Enable(is_advanced_mode)
-        
+
     @debug_log
     def on_advanced_mode(self, event=None):
         is_advanced_mode: bool = not self.is_advanced_mode.GetValue()

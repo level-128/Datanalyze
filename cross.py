@@ -1,6 +1,6 @@
 """
 this library is a interpreter of the GUI, which serve to translate the mathematics language to the python command
-and calling the plotting api in the yuyi
+and calling the plotting api in the Odysseus
 
 Copyright (C) 2020  Weizheng Wang
 
@@ -18,8 +18,8 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 from typing import Tuple, List, Union, Any
-from config.config_library import get_config, set_config, printf, debug_log
-import random
+from config.config_library import get_config, set_config, fprintf, debug_log, RaisedCritical
+import Nekoplot
 
 
 """these are the constants which will be used in the parser."""
@@ -51,14 +51,11 @@ CONST_2D_MODE: int = 21
 CONST_3D_MODE: int = 22
 CONST_POLAR_MODE: int = 23
 
+current_plt:Union[None, Any] = None
+
 """
 create a figure when this file is imported from the datanalyze env.
 """
-
-if __name__ != '__main__':
-    import yuyi
-
-    current_plt = yuyi.falcon()
 
 
 class RaisedReturn(Exception):
@@ -67,33 +64,34 @@ class RaisedReturn(Exception):
     """
 
     def __init__(self, *args):
-        printf(f"Raised return triggered. {args=}", self_=self)
+        fprintf(f"Raised return triggered. {args=}", self_=self)
         self.args = args
         pass
 
 
 @debug_log
-def new_fig(*void):
-    global current_plt
-    del current_plt
-    current_plt = yuyi.falcon()
-
-
-@debug_log
-def show(*void):
+def show():
+    if current_plt is None:
+        raise RaisedCritical(message="the current_plot object haven't create yet.", module_name=show)
     current_plt.show()
 
 
 @debug_log
-def plot(input_str: str, python_mode: bool = False):
+def plot(input_str: str, python_mode: bool = False, is_new_fig=False):
+    #  TODO: move 'is_new_fig' into the param, and make HOLDON param into a new variable
+    global current_plt
+    if current_plt is None or is_new_fig:
+        current_plt = Nekoplot.falcon()
     interpret_to_falcon(input_str, python_mode)
 
 
 @debug_log
-def save(file_type=get_config("$default_save_format"), file_dir=None) -> str:
+def save(file_type=get_config("save_format"), file_dir=None) -> str:
+    if current_plt is None:
+        raise RaisedCritical(message="the current_plot object haven't create yet.", module_name=save)
     if file_dir is None:
         file_dir = f'Saved Image\\figure{str(get_config("fig_number", 1))}'
-    printf("save the file with " + file_type + ' in ' + file_dir)
+    fprintf("save the file with " + file_type + ' in ' + file_dir)
     current_plt.export_fig(file_type, file_dir)
     set_config(fig_number=get_config("fig_number", 1) + 1)
     return f'{file_dir}.{str(file_type)}'
@@ -109,8 +107,9 @@ def interpret_to_falcon(input_str: str, python_mode: bool = False) -> None:
     means the input will be analyzed.
     :return: None
     """
-    if python_mode:
-        plot = yuyi.falcon()
+    if python_mode:  # TODO: solve this issue in python mode
+        plot = Nekoplot.falcon()
+        import random
         exec(input_str)
     else:
         try:
@@ -120,7 +119,7 @@ def interpret_to_falcon(input_str: str, python_mode: bool = False) -> None:
             if type_const == CONST_VECTOR_MODE:
                 current_plt.plot_vectors(input_str)
                 return None
-            
+
             input_str = __analyze_function(input_str)
             if type_const == CONST_POLAR_MODE:
                 raise Exception("the polar mode is still developing")
@@ -140,16 +139,13 @@ def __interpret_is_key_word(input_str: str) -> None:
     elif input_str == 'HOLDON':
         set_config(new_fig=False)
         raise RaisedReturn()
-    elif input_str == 'PUSH':
-        show()
-        raise RaisedReturn()
     elif input_str[:4] == 'SAVE':
         try:
             filetype = input_str[4:].lstrip().rstrip()
             if filetype == '':
                 raise Exception("The file type is not valid!")
         except:
-            filetype: str = get_config("$default_save_format")
+            filetype: str = get_config("save_format")
         save(filetype)
         raise RaisedReturn()
     return None
@@ -325,17 +321,9 @@ def __analyze_function(input_str: str) -> str:
             var_element.append(element_str)
         var_element_category.append(element_content)
 
-    printf(f"{var_element=}, {var_element_category=}", self_=__analyze_function)
+    fprintf(f"{var_element=}, {var_element_category=}", self_=__analyze_function)
     var_element_category, var_element = __analyze_add_signs(var_element, var_element_category)
     input_str = ' ' + ' '.join(var_element) + ' '
     input_str = input_str.replace("^", "**")
-    printf(f"{input_str=}", self_=__analyze_function)
+    fprintf(f"{input_str=}", self_=__analyze_function)
     return input_str
-
-
-if __name__ == '__main__':
-    while True:
-        try:
-            print(__analyze_function(input(">>")))
-        except Exception as e:
-            print("ERROR:", e)

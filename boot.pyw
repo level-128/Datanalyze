@@ -2,7 +2,7 @@
 """
 this is the boot unity of the datanalyze environment
 for running the app, this part is required during the booting process.
-No models or function could run without the booting process.
+No modules or function could run without the booting process.
 
 author: Wang Weizheng
 build time: 06/14/2019 22:59
@@ -23,50 +23,48 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-
-if __name__ != '__main__':
-    raise ImportError("this module could not be imported!")
-
 import sys
-import os
-from typing import Any, Union, TextIO, Type
-from config.config_library import set_config, save_config, printf
 
+from typing import Any, Union, TextIO, Type, List
+from config.config_library import fprintf
 
-INIT_IMPORT_LIST = []
+INIT_CUSTOM_IMPORT_LIST = []
+
+INIT_PROJECT_IMPORT_LIST = ['Angelina']
 
 
 def set_screen_zoom(raw_magnify_ratio: float) -> None:
     """
 setting the windows zoom ratio. 
     """
-    if get_config("$default_GUI_force_set_zoom_ratio") is not None:
-        set_config("dpi_scale", get_config("$default_GUI_force_set_zoom_ratio"))
+    if get_config("GUI_force_set_zoom_ratio") is not None:
+        set_config("dpi_scale", get_config("GUI_force_set_zoom_ratio"))
         wx.MessageBox(f"the DPI scale has been sat manually to {get_config('dpi_scale')}.")
 
-    dpi_scale: float = raw_magnify_ratio * get_config("$default_GUI_force_set_zoom_bias_multiply") + get_config(
-        "$default_GUI_force_set_zoom_bias_add")  # UI magnify ratio
+    dpi_scale: float = raw_magnify_ratio * get_config("GUI_force_set_zoom_bias_multiply") + get_config(
+        "GUI_force_set_zoom_bias_add")  # UI magnify ratio
     set_config(dpi_scale=dpi_scale)
 
 
 def set_display_magnify_and_config() -> float:
     # detect vertical screen
-    scr_logic_x: int = GetSystemMetrics(0); scr_logic_y: int = GetSystemMetrics(1)
+    scr_logic_x: int = GetSystemMetrics(0);
+    scr_logic_y: int = GetSystemMetrics(1)
     set_config(is_vertical_screen=scr_logic_x < scr_logic_y)
 
     #  set the display resolution magnify ratio.
-    ctypes.windll.shcore.SetProcessDpiAwareness(get_config("$default_GUI_os_process_dpi_awareness"))
+    ctypes.windll.shcore.SetProcessDpiAwareness(get_config("GUI_os_process_dpi_awareness"))
 
     return GetSystemMetrics(0) / scr_logic_x  # the screen original magnify ratio
 
 
-def get_import_list() -> list:
+def get_import_list() -> List[str]:
     try:
         import_list_file: TextIO = open(r"config\import list.cfg", 'r')
     except IOError or WindowsError or FileNotFoundError:
         set_import_list()
         import_list_file: TextIO = open(r"config\import list.cfg", 'r')
-    import_list: dict = eval(import_list_file.read())
+    import_list: List[str] = import_list_file.read().split('\n')
     import_list_file.close()
     return import_list
 
@@ -77,20 +75,20 @@ def set_import_list():
     except IOError or WindowsError or FileNotFoundError:
         raise EnvInitFail(set_import_list, message=r"failed to load booting behavior, please check the "
                                                    r"config\import list.cfg file.")
-    import_list_file.write("#please list the file which you want to import during the loading progress. \n#it "
-                           "is not recommend to change this file unless you could make sure these models will work in "
-                           "the datanalysis environment.\n")
-    import_list_file.write(str(INIT_IMPORT_LIST))
+    import_list_file.write('\n'.join(INIT_CUSTOM_IMPORT_LIST))
     # these are basic lib for math and data analyze.
     import_list_file.close()
 
 
 def check_imports():
-    for curr_import in get_import_list():
-        try:
-            __import__(curr_import)
-        except Exception as ERROR:
-            wx.MessageBox(f"failed to load {curr_import} model, the program could not execute. {ERROR}")
+    full_module_name: list = INIT_PROJECT_IMPORT_LIST + (_ := get_import_list())
+    full_module_list: list = INIT_PROJECT_IMPORT_LIST + ["Lib." + _ for _ in _]
+    for index, curr_import in enumerate(full_module_list):
+        if not curr_import == 'Lib.':
+            try:
+                exec(f"{full_module_name[index]} = __import__('{curr_import}')")
+            except Exception as ERROR:
+                wx.MessageBox(f"failed to load {curr_import} module, the program may occurs errors. {ERROR}")
 
 
 if __name__ == "__main__":
@@ -104,9 +102,7 @@ if __name__ == "__main__":
         import wx
         from wx import Frame, App, Font, TextCtrl
     except ImportError:
-        set_config(ui_boot_fail=True)
-        save_config()
-        printf("boot failed, failed to import Wxpython framework.")
+        fprintf("boot failed, failed to import Wxpython framework.")
         sys.exit(1)
     else:
         app: App = wx.App()
@@ -116,6 +112,7 @@ if __name__ == "__main__":
         from win32api import GetSystemMetrics
         # noinspection PyUnresolvedReferences
         import ctypes
+
         raw_magnify_ratio = set_display_magnify_and_config()
     except ImportError:
         raw_magnify_ratio = 1
@@ -134,7 +131,7 @@ if __name__ == "__main__":
     frame.SetMaxSize((int(500 * dpi), int(80 * dpi)))
     frame.SetMinSize((int(500 * dpi), int(80 * dpi)))
     font = wx.Font(14, wx.MODERN, wx.NORMAL, wx.NORMAL, False, "Microsoft YaHei")
-    wf.box = wx.TextCtrl(frame, pos=(-2, int(50*dpi)), size=(int(504 * dpi), int(30 * dpi)), style=wx.TE_CENTER)
+    wf.box = wx.TextCtrl(frame, pos=(-2, int(50 * dpi)), size=(int(504 * dpi), int(30 * dpi)), style=wx.TE_CENTER)
     wf.box.SetFont(font)
     wf.box.AppendText("Loading")
     wf.box.SetCanFocus(False)
