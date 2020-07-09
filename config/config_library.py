@@ -59,7 +59,7 @@ from collections.abc import Iterable, Callable, Container
 from json import JSONDecodeError
 from typing import TextIO, Union, Any
 
-__version__ = '20.06.28'  # the last modify date
+__version__ = '20.07.09'  # the last modify date
 
 FILE_DIR: str = r"config\bootconfig.cfg"
 LOG_DIR: str = r"config\cfg_log.log"
@@ -68,6 +68,7 @@ log_file: Union[None, TextIO] = None
 start_time: Union[float, None] = None
 
 DEFAULT_VARS: dict = {
+    "$version": __version__,
 
     # the GUI settings
     "$GUI_force_set_zoom_ratio": None,  # manually set self.gui value, none or float
@@ -429,7 +430,7 @@ class config:
         rebuild the config file when the file is deleted.
         :return: None
         """
-        for x in self.__config_dict.keys():
+        for x in tuple(self.__config_dict.keys()):
             if x[0] != "$":
                 self.__config_dict.pop(x)
         if save:
@@ -459,8 +460,8 @@ class config:
 running process below
 """
 if __name__ == '__main__':
-    raise EnvInitFail("this lib isn't used for run directly. If you want to perform a unit test, use another file and "
-                      "import this instead.")
+    print("\n\nyou can't run this file directly, run boot.pyw instead.")
+    exit(1)
 
 config = config()  # you can't define a new instance from now.
 

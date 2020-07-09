@@ -4,7 +4,7 @@ this is the boot unity of the datanalyze environment
 for running the app, this part is required during the booting process.
 No modules or function could run without the booting process.
 
-author: Wang Weizheng
+author: Weizheng Wang
 build time: 06/14/2019 22:59
 
 COPYRIGHT INFORMATION:
@@ -24,7 +24,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 For more information, please refer to <https://unlicense.org>
 """
-
+import os
 import sys
 
 from typing import Any, Union, TextIO, Type, List
@@ -109,29 +109,46 @@ if __name__ == "__main__":
     else:
         app: App = wx.App()
 
-    try:
-        # noinspection PyUnresolvedReferences
-        from win32api import GetSystemMetrics
-        # noinspection PyUnresolvedReferences
-        import ctypes
+    if os.name == 'nt':
+        try:
+            # noinspection PyUnresolvedReferences
+            from win32api import GetSystemMetrics
+            # noinspection PyUnresolvedReferences
+            # in windows 7 and 8 and some early versions of windows10, SetProcessDpiAwareness could only be 0 and 1.
+            import ctypes
+        except ImportError:
+            raw_magnify_ratio = 1
+            wx.MessageBox(r'failed to import windows32 API lib. This may due to operating system type. Only windows 10 '
+                          r'is recommended for running this software smoothly, and the support for other platform is '
+                          r'still developing and unstable. If you are using windows 10, please make sure to use the '
+                          r'interpreter which installed win32 lib.')
+            exit(1)
+        else:
+            raw_magnify_ratio = set_display_magnify_and_config()
+            del GetSystemMetrics
+            del ctypes
+            set_screen_zoom(raw_magnify_ratio)
 
-        raw_magnify_ratio = set_display_magnify_and_config()
-    except ImportError:
-        raw_magnify_ratio = 1
-        wx.MessageBox(r'failed to import windows32 API lib. This may due to operating system type. Only windows is '
-                      r'recommended for running this software smoothly, and the support for other platform is still '
-                      r'developing and unstable. If you are using windows, please make sure to use the interpreter '
-                      r'which installed win32 lib.')
+    else:
+        wx.MessageBox("""Operating system info:
+        
+        Datanalyze **DOES NOT** officially support MacOS and Linux. 
+        
+        You should consider install Windows, using Wine (https://www.winehq.org/) or 
+        building your own Python environment (See Datanalyze Python environment 
+        requirements). There are no ongoing bug or coverage tests under these 
+        platforms, so GUI may behave abnormal and some APIs may malfunction under 
+        Linux and MacOS
+        """)
 
-    set_screen_zoom(raw_magnify_ratio)
-
-    dpi = get_config("dpi_scale")
+    dpi = get_config("dpi_scale", 1)
 
     wf: Type[Frame] = wx.Frame
     frame: Frame = wf(None, title="", size=(int(500 * dpi), int(80 * dpi)), style=1)
     frame.SetTransparent(200)
     frame.SetMaxSize((int(500 * dpi), int(80 * dpi)))
     frame.SetMinSize((int(500 * dpi), int(80 * dpi)))
+    # noinspection PyUnresolvedReferences
     font = wx.Font(14, wx.MODERN, wx.NORMAL, wx.NORMAL, False, "Microsoft YaHei")
     wf.box = wx.TextCtrl(frame, pos=(-2, int(50 * dpi)), size=(int(504 * dpi), int(30 * dpi)), style=wx.TE_CENTER)
     wf.box.SetFont(font)
