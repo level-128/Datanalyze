@@ -2,7 +2,7 @@
 
 ![](https://img.shields.io/badge/branch-master-brightgreen.svg?style=flat-square)
 ![](https://img.shields.io/badge/version-20.07.09-blue.svg?style=flat-square)
-![](https://img.shields.io/badge/readme-20.07.09.1-yellow.svg?style=flat-square)
+![](https://img.shields.io/badge/readme_version-r20.07.10-yellow.svg?style=flat-square)
 ![](https://img.shields.io/badge/last_update-7/9/2020-violet.svg?style=flat-square)
 
 Datanalyze is a mathematical graphing software, which uses Matplotlib as rendering 
