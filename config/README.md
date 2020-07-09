@@ -43,7 +43,8 @@ automatically and requires you to restart.
 
 #### 4. `import list.cfg`
 
-read `README_script_folder.md` under Lib for more info
+read [README](https://github.com/EPIC-WANG/Datanalyze/blob/master/Lib/README.md)
+under Lib for more info
 
 &nbsp;
 
