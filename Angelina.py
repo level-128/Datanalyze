@@ -38,8 +38,6 @@ HELP_WEBSITE = 'https://github.com/EPIC-WANG/Datanalyze'  # the website if user 
 
 
 # noinspection DuplicatedCode,PyAttributeOutsideInit
-# the GUI contains too many duplicated codes, and you know why.
-# noinspection PyUnusedLocal
 class Alexander(wx.Frame):
     dpi = get_config("dpi_scale", 1.0)
     INIT_WINDOW_SIZE_HOR: tuple = (420 * dpi, 320 * dpi)
