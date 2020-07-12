@@ -22,7 +22,8 @@ complete the installation wizard.
 For MacOS and Linux users, Datanalyze **DOES NOT** officially support your platform. 
 You should consider installing Windows, using [Wine](https://www.winehq.org/) or 
 building your own Python environment (See [Datanalyze Python environment requirements
-]()). There are no ongoing bug or coverage tests under these platforms, so GUI may
+](https://github.com/EPIC-WANG/Datanalyze/blob/master/documents/Python%20Environment%20Requirements.md)).
+There are no ongoing bug or coverage tests under these platforms, so GUI may
 behave abnormal and some APIs may malfunction under Linux and MacOS
 
 ------------------------------------------------------------------------------------
@@ -53,7 +54,7 @@ This tutorial will provides you an overview of what Datanalyze does. You only ne
 less than 5 minutes to complete the Tutorial, so please take a look.
 
 For more information and advanced operations for Datanalyze, please go to 
-[Datanalyze complete user guide](). 
+[Datanalyze complete user guide](https://github.com/EPIC-WANG/Datanalyze/blob/master/documents/Datanalyze%20User%20Guide.md). 
 This guide includes advanced Datanalyze commands and syntax as well as detailed 
 settings which would customize your plot. 
 
@@ -177,9 +178,9 @@ under `Datanalyze\config`
 
 ### 2. Documents
 
-1. [API Reference](), 
+1. [API Reference](https://github.com/EPIC-WANG/Datanalyze/blob/master/documents/API%20Reference.md), 
 providing introductions about the APIs provided in Python mode
-2. [Python Environment Requirements]()
+2. [Python Environment Requirements](https://github.com/EPIC-WANG/Datanalyze/blob/master/documents/Python%20Environment%20Requirements.md)
 Guide for users who need to build an environment for debugging.
 
 ---
