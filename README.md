@@ -16,8 +16,9 @@ them in 2D or 3D axes.
 
 ## Install
 
-To install Datanalyze on Windows 10, download a [Windows installation package]() and
-complete the installation wizard. 
+To install Datanalyze on Windows 10, download a 
+[Windows installation package](https://github.com/EPIC-WANG/Datanalyze/releases/download/20.07.09/mysetup.exe) 
+and complete the installation wizard. 
 
 For MacOS and Linux users, Datanalyze **DOES NOT** officially support your platform. 
 You should consider installing Windows, using [Wine](https://www.winehq.org/) or 
