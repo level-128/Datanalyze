@@ -31,7 +31,7 @@ behave abnormal and some APIs may malfunction under Linux and MacOS
 
 ## License
 
-Copyleft (C) 2020 Weizheng Wang
+Copyleft (C) 2020 level-128
 
 this software is licensed under _Unlicense_ license
 
