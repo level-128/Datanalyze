@@ -12,6 +12,8 @@ Datanalyze supports to graph mathematical vectors and functions: it could handle
 explicit or implicit function in a polar or rectangular coordinate system, graphing 
 them in 2D or 3D axes.
 
+# This project is no longer maintained. 
+
 ------------------------------------------------------------------------------------
 
 ## Install
